@@ -2,25 +2,28 @@ package com.jency.guardian.authentication.dto.response;
 
 public class LoginResponse {
 
-    private Long userId;
-    private String fullName;
-    private String message;
+    private String accessToken;
+    private String tokenType;
+    private Long expiresIn;
 
-    public LoginResponse(Long userId, String fullName, String message) {
-        this.userId = userId;
-        this.fullName = fullName;
-        this.message = message;
+    public LoginResponse(String accessToken,
+                         String tokenType,
+                         Long expiresIn) {
+
+        this.accessToken = accessToken;
+        this.tokenType = tokenType;
+        this.expiresIn = expiresIn;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getTokenType() {
+        return tokenType;
     }
 
-    public String getMessage() {
-        return message;
+    public Long getExpiresIn() {
+        return expiresIn;
     }
 }

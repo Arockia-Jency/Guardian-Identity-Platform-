@@ -8,16 +8,24 @@ import com.jency.guardian.authentication.entity.User;
 import com.jency.guardian.authentication.repository.UserRepository;
 import com.jency.guardian.authentication.service.AuthService;
 import org.springframework.stereotype.Service;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
+import com.jency.guardian.security.service.JwtService;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthServiceImpl(UserRepository userRepository) {
+    public AuthServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           JwtService jwtService
+                           ) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -32,9 +40,7 @@ public class AuthServiceImpl implements AuthService {
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
 
-        // TODO: Encrypt password using BCrypt
-        user.setPasswordHash(request.getPassword());
-
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         User savedUser = userRepository.save(user);
 
         return new RegisterResponse(
@@ -54,16 +60,16 @@ public class AuthServiceImpl implements AuthService {
 
         User user = optionalUser.get();
 
-        // For now, compare plain passwords.
-        // Later we'll use BCrypt.
-        if (!user.getPasswordHash().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new RuntimeException("Invalid email or password");
         }
 
+        String token = jwtService.generateToken(user.getEmail());
+
         return new LoginResponse(
-                user.getId(),
-                user.getFullName(),
-                "Login successful"
+                token,
+                "Bearer",
+                3600000L
         );
     }
 }
