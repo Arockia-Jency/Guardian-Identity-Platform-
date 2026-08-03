@@ -1,4 +1,4 @@
-package com.jency.guardian.authentication.entity;
+package com.jency.guardian.features.authentication.entity;
 
 
 import jakarta.persistence.*;

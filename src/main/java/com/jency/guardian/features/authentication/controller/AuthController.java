@@ -1,11 +1,11 @@
-package com.jency.guardian.authentication.controller;
+package com.jency.guardian.features.authentication.controller;
 
 
-import com.jency.guardian.authentication.dto.request.LoginRequest;
-import com.jency.guardian.authentication.dto.request.RegisterRequest;
-import com.jency.guardian.authentication.dto.response.LoginResponse;
-import com.jency.guardian.authentication.dto.response.RegisterResponse;
-import com.jency.guardian.authentication.service.AuthService;
+import com.jency.guardian.features.authentication.dto.request.LoginRequest;
+import com.jency.guardian.features.authentication.dto.request.RegisterRequest;
+import com.jency.guardian.features.authentication.dto.response.LoginResponse;
+import com.jency.guardian.features.authentication.dto.response.RegisterResponse;
+import com.jency.guardian.features.authentication.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

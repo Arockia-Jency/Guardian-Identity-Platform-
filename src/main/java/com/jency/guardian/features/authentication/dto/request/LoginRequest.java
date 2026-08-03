@@ -1,4 +1,4 @@
-package com.jency.guardian.authentication.dto.request;
+package com.jency.guardian.features.authentication.dto.request;
 
 public class LoginRequest {
 

@@ -1,4 +1,4 @@
-package com.jency.guardian.authentication.dto.response;
+package com.jency.guardian.features.authentication.dto.response;
 
 public class ProfileResponse {
 

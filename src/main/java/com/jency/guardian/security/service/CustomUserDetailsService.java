@@ -1,7 +1,7 @@
 package com.jency.guardian.security.service;
 
-import com.jency.guardian.authentication.entity.User;
-import com.jency.guardian.authentication.repository.UserRepository;
+import com.jency.guardian.features.authentication.entity.User;
+import com.jency.guardian.features.authentication.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

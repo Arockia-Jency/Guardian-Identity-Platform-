@@ -1,6 +1,6 @@
-package com.jency.guardian.authentication.repository;
+package com.jency.guardian.features.authentication.repository;
 
-import com.jency.guardian.authentication.entity.User;
+import com.jency.guardian.features.authentication.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
