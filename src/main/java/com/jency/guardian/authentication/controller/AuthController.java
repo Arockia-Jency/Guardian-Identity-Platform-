@@ -20,7 +20,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public RegisterResponse register(@RequestBody RegisterRequest request) {
-
         return authService.register(request);
     }
 

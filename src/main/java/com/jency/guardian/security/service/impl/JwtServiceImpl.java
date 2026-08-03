@@ -5,6 +5,7 @@ import com.jency.guardian.security.service.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -46,10 +47,11 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean isTokenValid(String token) {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+
         try {
-            extractUsername(token);
-            return true;
+            String username = extractUsername(token);
+            return username.equals(userDetails.getUsername());
         } catch (Exception e) {
             return false;
         }
