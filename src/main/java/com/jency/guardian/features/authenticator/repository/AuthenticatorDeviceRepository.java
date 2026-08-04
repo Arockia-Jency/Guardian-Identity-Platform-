@@ -10,5 +10,6 @@ public interface AuthenticatorDeviceRepository
         extends JpaRepository<AuthenticatorDevice, Long> {
 
     List<AuthenticatorDevice> findByUserId(Long userId);
+    void deleteByUserId(Long userId);
 
 }
