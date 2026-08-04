@@ -93,6 +93,17 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
                 request.getOtp()
         );
 
-        return new VerifyOtpResponse(verified);
+        if (verified) {
+            user.setMfaEnabled(true);
+            userRepository.save(user);
+        }
+
+        return new VerifyOtpResponse(
+                verified,
+                user.getMfaEnabled(),
+                verified
+                        ? "Authenticator verified successfully."
+                        : "Invalid OTP."
+        );
     }
 }

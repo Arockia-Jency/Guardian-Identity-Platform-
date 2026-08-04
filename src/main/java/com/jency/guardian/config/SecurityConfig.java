@@ -27,7 +27,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/health",
                                 "/api/v1/auth/register",
-                                "/api/v1/auth/login"
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/login/verify-otp",
+                                "/api/v1/auth/login/recovery"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

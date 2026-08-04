@@ -24,6 +24,9 @@ public class User {
     @Column(name = "email_verified")
     private Boolean emailVerified = false;
 
+    @Column(name = "mfa_enabled", nullable = false)
+    private Boolean mfaEnabled = false;
+
     @Column(name = "account_status")
     private String accountStatus = "ACTIVE";
 
@@ -55,6 +58,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Boolean getMfaEnabled() {
+        return mfaEnabled;
+    }
+
+    public void setMfaEnabled(Boolean mfaEnabled) {
+        this.mfaEnabled = mfaEnabled;
     }
 
     public String getPasswordHash() {

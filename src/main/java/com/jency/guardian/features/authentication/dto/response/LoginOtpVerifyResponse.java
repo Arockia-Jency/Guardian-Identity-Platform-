@@ -1,24 +1,21 @@
 package com.jency.guardian.features.authentication.dto.response;
 
-public class LoginResponse {
+public class LoginOtpVerifyResponse {
 
-    private boolean mfaRequired;
     private String accessToken;
     private String tokenType;
     private Long expiresIn;
     private String message;
 
-    public LoginResponse(boolean mfaRequired, String accessToken, String tokenType, Long expiresIn, String message) {
+    public LoginOtpVerifyResponse(String accessToken,
+                                  String tokenType,
+                                  Long expiresIn,
+                                  String message) {
 
-        this.mfaRequired = mfaRequired;
         this.accessToken = accessToken;
         this.tokenType = tokenType;
         this.expiresIn = expiresIn;
         this.message = message;
-    }
-
-    public boolean isMfaRequired() {
-        return mfaRequired;
     }
 
     public String getAccessToken() {
