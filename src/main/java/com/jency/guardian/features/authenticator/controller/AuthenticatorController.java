@@ -1,7 +1,9 @@
 package com.jency.guardian.features.authenticator.controller;
 
 import com.jency.guardian.features.authenticator.dto.request.RegisterAuthenticatorRequest;
+import com.jency.guardian.features.authenticator.dto.request.VerifyOtpRequest;
 import com.jency.guardian.features.authenticator.dto.response.RegisterAuthenticatorResponse;
+import com.jency.guardian.features.authenticator.dto.response.VerifyOtpResponse;
 import com.jency.guardian.features.authenticator.service.impl.AuthenticatorService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +20,12 @@ public class AuthenticatorController {
     @PostMapping("/register")
     public RegisterAuthenticatorResponse register(
             @RequestBody RegisterAuthenticatorRequest request) {
-
         return authenticatorService.register(request);
+    }
+
+    @PostMapping("/verify")
+    public VerifyOtpResponse verifyOtp(
+            @RequestBody VerifyOtpRequest request) {
+        return authenticatorService.verifyOtp(request);
     }
 }

@@ -12,6 +12,27 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
+
+    @Column(name = "account_status")
+    private String accountStatus = "ACTIVE";
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
     public Long getId() {
         return id;
     }
@@ -76,26 +97,7 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    @Column(name = "full_name", nullable = false)
-    private String fullName;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
-
-    @Column(name = "email_verified")
-    private Boolean emailVerified = false;
-
-    @Column(name = "account_status")
-    private String accountStatus = "ACTIVE";
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
     public User() {
     }
