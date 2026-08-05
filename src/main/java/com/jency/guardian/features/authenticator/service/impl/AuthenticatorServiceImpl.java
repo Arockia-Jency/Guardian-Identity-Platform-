@@ -2,6 +2,7 @@ package com.jency.guardian.features.authenticator.service.impl;
 
 
 import com.jency.guardian.common.dto.response.ApiResponse;
+import com.jency.guardian.common.exception.ApiException;
 import com.jency.guardian.features.authentication.entity.User;
 import com.jency.guardian.features.authentication.repository.UserRepository;
 import com.jency.guardian.features.authenticator.dto.request.DisableMfaRequest;
@@ -54,7 +55,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found"));
 
         // Temporary secret
         String secretKey = secretKeyService.generateSecretKey();
@@ -87,13 +88,13 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found"));
 
         AuthenticatorDevice device = deviceRepository
                 .findByUserId(user.getId())
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No authenticator registered"));
+                .orElseThrow(() -> new ApiException("No authenticator registered"));
 
         System.out.println("DB Secret : " + device.getSecretKey());
         System.out.println("OTP Received : " + request.getOtp());
@@ -126,14 +127,14 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found"));
 
         AuthenticatorDevice device =
                 deviceRepository.findByUserId(user.getId())
                         .stream()
                         .findFirst()
                         .orElseThrow(() ->
-                                new RuntimeException("No authenticator registered"));
+                                new ApiException("No authenticator registered"));
 
         return new DeviceResponse(
                 device.getDeviceName(),
@@ -152,7 +153,7 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found"));
 
         deviceRepository.deleteByUserId(user.getId());
 
@@ -179,13 +180,13 @@ public class AuthenticatorServiceImpl implements AuthenticatorService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found"));
 
         if (!passwordEncoder.matches(
                 request.getPassword(),
                 user.getPasswordHash())) {
 
-            throw new RuntimeException("Invalid password");
+            throw new ApiException("Invalid password");
         }
 
         deviceRepository.deleteByUserId(user.getId());

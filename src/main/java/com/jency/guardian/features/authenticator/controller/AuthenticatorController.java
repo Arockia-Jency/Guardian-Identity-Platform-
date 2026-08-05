@@ -8,6 +8,7 @@ import com.jency.guardian.features.authenticator.dto.response.DeviceResponse;
 import com.jency.guardian.features.authenticator.dto.response.RegisterAuthenticatorResponse;
 import com.jency.guardian.features.authenticator.dto.response.VerifyOtpResponse;
 import com.jency.guardian.features.authenticator.service.impl.AuthenticatorService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,14 +22,12 @@ public class AuthenticatorController {
     }
 
     @PostMapping("/register")
-    public RegisterAuthenticatorResponse register(
-            @RequestBody RegisterAuthenticatorRequest request) {
+    public RegisterAuthenticatorResponse register( @Valid @RequestBody RegisterAuthenticatorRequest request) {
         return authenticatorService.register(request);
     }
 
     @PostMapping("/verify")
-    public VerifyOtpResponse verifyOtp(
-            @RequestBody VerifyOtpRequest request) {
+    public VerifyOtpResponse verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
         return authenticatorService.verifyOtp(request);
     }
     @GetMapping("/device")
@@ -42,8 +41,7 @@ public class AuthenticatorController {
     }
 
     @PostMapping("/disable")
-    public ApiResponse disableMfa(
-            @RequestBody DisableMfaRequest request) {
+    public ApiResponse disableMfa(@Valid @RequestBody DisableMfaRequest request) {
         return authenticatorService.disableMfa(request);
     }
 }

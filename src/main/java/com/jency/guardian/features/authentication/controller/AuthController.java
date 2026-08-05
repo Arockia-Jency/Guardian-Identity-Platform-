@@ -34,7 +34,7 @@ public class AuthController {
     }
 
     @PostMapping("/login/verify-otp")
-    public LoginOtpVerifyResponse verifyLoginOtp(@RequestBody LoginOtpVerifyRequest request){
+    public LoginOtpVerifyResponse verifyLoginOtp( @Valid @RequestBody LoginOtpVerifyRequest request){
         return authService.verifyLoginOtp(request);
     }
     @PostMapping("/recovery-codes")
@@ -43,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/login/recovery")
-    public LoginResponse verifyRecoveryCode(@RequestBody VerifyRecoveryCodeRequest request) {
+    public LoginResponse verifyRecoveryCode( @Valid @RequestBody VerifyRecoveryCodeRequest request) {
         return authService.verifyRecoveryCode(request);
     }
 
