@@ -33,7 +33,11 @@ public class SecurityConfig {
                                 "/api/v1/auth/forgot-password",
                                 "/api/v1/auth/verify-reset-otp",
                                 "/api/v1/auth/reset-password",
-                                "/api/v1/auth/verify-email-otp"
+                                "/api/v1/auth/verify-email-otp",
+
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
