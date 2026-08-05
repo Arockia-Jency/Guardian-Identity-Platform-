@@ -1,11 +1,7 @@
 package com.jency.guardian.features.authentication.service;
 
-import com.jency.guardian.features.authentication.dto.request.LoginOtpVerifyRequest;
-import com.jency.guardian.features.authentication.dto.request.LoginRequest;
-import com.jency.guardian.features.authentication.dto.request.RegisterRequest;
-import com.jency.guardian.features.authentication.dto.response.LoginOtpVerifyResponse;
-import com.jency.guardian.features.authentication.dto.response.LoginResponse;
-import com.jency.guardian.features.authentication.dto.response.RegisterResponse;
+import com.jency.guardian.features.authentication.dto.request.*;
+import com.jency.guardian.features.authentication.dto.response.*;
 import com.jency.guardian.features.authenticator.dto.request.VerifyRecoveryCodeRequest;
 import com.jency.guardian.features.authenticator.dto.response.RecoveryCodesResponse;
 
@@ -20,4 +16,12 @@ public interface AuthService {
     RecoveryCodesResponse generateRecoveryCodes();
 
     LoginResponse verifyRecoveryCode(VerifyRecoveryCodeRequest request);
+
+    ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request);
+
+    ResetPasswordResponse resetPassword(ResetPasswordRequest request);
+
+    VerifyResetOtpResponse verifyResetOtp(VerifyResetOtpRequest request);
+
+    VerifyEmailOtpResponse verifyEmailOtp(VerifyEmailOtpRequest request);
 }

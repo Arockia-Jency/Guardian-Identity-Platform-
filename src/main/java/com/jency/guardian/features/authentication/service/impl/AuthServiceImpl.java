@@ -1,15 +1,16 @@
 package com.jency.guardian.features.authentication.service.impl;
 
 import com.jency.guardian.common.exception.ApiException;
-import com.jency.guardian.features.authentication.dto.request.LoginOtpVerifyRequest;
-import com.jency.guardian.features.authentication.dto.request.LoginRequest;
-import com.jency.guardian.features.authentication.dto.request.RegisterRequest;
-import com.jency.guardian.features.authentication.dto.response.LoginOtpVerifyResponse;
-import com.jency.guardian.features.authentication.dto.response.LoginResponse;
-import com.jency.guardian.features.authentication.dto.response.RegisterResponse;
+import com.jency.guardian.features.authentication.dto.request.*;
+import com.jency.guardian.features.authentication.dto.response.*;
+import com.jency.guardian.features.authentication.entity.EmailVerificationOtp;
+import com.jency.guardian.features.authentication.entity.PasswordResetOtp;
 import com.jency.guardian.features.authentication.entity.User;
+import com.jency.guardian.features.authentication.repository.EmailVerificationOtpRepository;
+import com.jency.guardian.features.authentication.repository.PasswordResetOtpRepository;
 import com.jency.guardian.features.authentication.repository.UserRepository;
 import com.jency.guardian.features.authentication.service.AuthService;
+import com.jency.guardian.features.authentication.service.EmailService;
 import com.jency.guardian.features.authenticator.dto.request.VerifyRecoveryCodeRequest;
 import com.jency.guardian.features.authenticator.dto.response.RecoveryCodesResponse;
 import com.jency.guardian.features.authenticator.entity.AuthenticatorDevice;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.jency.guardian.security.service.JwtService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -39,10 +41,13 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticatorDeviceRepository deviceRepository;
     private final TotpService totpService;
     private final RecoveryCodeRepository recoveryCodeRepository;
+    private final PasswordResetOtpRepository passwordResetOtpRepository;
+    private final EmailVerificationOtpRepository emailVerificationOtpRepository;
+    private final EmailService emailService;
 
     public AuthServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
-                           JwtService jwtService, AuthenticatorDeviceRepository deviceRepository, TotpService totpService, RecoveryCodeRepository recoveryCodeRepository
+                           JwtService jwtService, AuthenticatorDeviceRepository deviceRepository, TotpService totpService, RecoveryCodeRepository recoveryCodeRepository, PasswordResetOtpRepository passwordResetOtpRepository, EmailVerificationOtpRepository emailVerificationOtpRepository, EmailService emailService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -50,6 +55,9 @@ public class AuthServiceImpl implements AuthService {
         this.deviceRepository = deviceRepository;
         this.totpService = totpService;
         this.recoveryCodeRepository = recoveryCodeRepository;
+        this.passwordResetOtpRepository = passwordResetOtpRepository;
+        this.emailVerificationOtpRepository = emailVerificationOtpRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -66,10 +74,29 @@ public class AuthServiceImpl implements AuthService {
 
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         User savedUser = userRepository.save(user);
+        // Remove existing OTP if any
+        emailVerificationOtpRepository.deleteByUserId(savedUser.getId());
+
+// Generate 6-digit OTP
+        String otp = String.valueOf(
+                (int) ((Math.random() * 900000) + 100000));
+
+        EmailVerificationOtp emailOtp =
+                emailVerificationOtpRepository.findByUserId(savedUser.getId())
+                        .orElse(new EmailVerificationOtp());
+
+        emailOtp.setUser(savedUser);
+        emailOtp.setOtp(otp);
+        emailOtp.setVerified(false);
+        emailOtp.setExpiresAt(LocalDateTime.now().plusMinutes(5));
+
+        emailVerificationOtpRepository.save(emailOtp);
+
+        emailService.sendOtp(savedUser.getEmail(), otp);
 
         return new RegisterResponse(
                 savedUser.getId(),
-                "User registered successfully"
+                "User registered successfully. Please verify your email."
         );
     }
 
@@ -86,6 +113,11 @@ public class AuthServiceImpl implements AuthService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new ApiException("Invalid email or password");
+        }
+
+        // Add this block
+        if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new ApiException("Please verify your email before logging in.");
         }
         if (Boolean.TRUE.equals(user.getMfaEnabled())) {
 
@@ -204,6 +236,129 @@ public class AuthServiceImpl implements AuthService {
                 "Bearer",
                 3600000L,
                 "Login successful using recovery code."
+        );
+    }
+
+    @Override
+    @Transactional
+    public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ApiException("User not found"));
+
+        // Remove old OTP if it exists
+        passwordResetOtpRepository.deleteByUserId(user.getId());
+
+        // Generate 6-digit OTP
+        String otp = String.valueOf(
+                (int) ((Math.random() * 900000) + 100000));
+
+        PasswordResetOtp passwordResetOtp =
+                passwordResetOtpRepository.findByUserId(user.getId())
+                        .orElse(new PasswordResetOtp());
+
+        passwordResetOtp.setUser(user);
+        passwordResetOtp.setOtp(otp);
+        passwordResetOtp.setExpiresAt(LocalDateTime.now().plusMinutes(5));
+        passwordResetOtp.setVerified(false);
+
+        passwordResetOtpRepository.save(passwordResetOtp);
+
+        // Temporary (replace with email later)
+        System.out.println("==================================");
+        System.out.println("PASSWORD RESET OTP : " + otp);
+        System.out.println("==================================");
+
+        return new ForgotPasswordResponse(
+                "Password reset OTP generated successfully.");
+    }
+
+    @Override
+    public ResetPasswordResponse resetPassword(
+            ResetPasswordRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new ApiException("User not found"));
+
+        PasswordResetOtp passwordResetOtp =
+                passwordResetOtpRepository
+                        .findByUserId(user.getId())
+                        .orElseThrow(() ->
+                                new ApiException("Please verify OTP first"));
+
+        if (!passwordResetOtp.getVerified()) {
+            throw new ApiException("Please verify OTP first");
+        }
+
+        user.setPasswordHash(
+                passwordEncoder.encode(request.getNewPassword())
+        );
+
+        userRepository.save(user);
+
+        passwordResetOtpRepository.delete(passwordResetOtp);
+
+        return new ResetPasswordResponse(
+                "Password reset successfully."
+        );
+    }
+
+    @Override
+    public VerifyResetOtpResponse verifyResetOtp(
+            VerifyResetOtpRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new ApiException("User not found"));
+
+        PasswordResetOtp passwordResetOtp =
+                passwordResetOtpRepository
+                        .findByUserIdAndOtpAndVerifiedFalse(
+                                user.getId(),
+                                request.getOtp())
+                        .orElseThrow(() ->
+                                new ApiException("Invalid OTP"));
+
+        if (passwordResetOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException("OTP has expired");
+        }
+
+        passwordResetOtp.setVerified(true);
+        passwordResetOtpRepository.save(passwordResetOtp);
+
+        return new VerifyResetOtpResponse(
+                "OTP verified successfully."
+        );
+    }
+
+    @Override
+    public VerifyEmailOtpResponse verifyEmailOtp(
+            VerifyEmailOtpRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new ApiException("User not found"));
+
+        EmailVerificationOtp emailOtp =
+                emailVerificationOtpRepository
+                        .findByUserIdAndOtpAndVerifiedFalse(
+                                user.getId(),
+                                request.getOtp())
+                        .orElseThrow(() ->
+                                new ApiException("Invalid OTP"));
+
+        if (emailOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException("OTP has expired");
+        }
+
+        user.setEmailVerified(true);
+        userRepository.save(user);
+
+        emailVerificationOtpRepository.delete(emailOtp);
+
+        return new VerifyEmailOtpResponse(
+                "Email verified successfully."
         );
     }
 }

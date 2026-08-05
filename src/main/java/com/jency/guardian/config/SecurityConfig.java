@@ -29,7 +29,11 @@ public class SecurityConfig {
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/login/verify-otp",
-                                "/api/v1/auth/login/recovery"
+                                "/api/v1/auth/login/recovery",
+                                "/api/v1/auth/forgot-password",
+                                "/api/v1/auth/verify-reset-otp",
+                                "/api/v1/auth/reset-password",
+                                "/api/v1/auth/verify-email-otp"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
