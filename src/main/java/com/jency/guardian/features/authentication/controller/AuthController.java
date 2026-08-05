@@ -10,6 +10,7 @@ import com.jency.guardian.features.authentication.dto.response.RegisterResponse;
 import com.jency.guardian.features.authentication.service.AuthService;
 import com.jency.guardian.features.authenticator.dto.request.VerifyRecoveryCodeRequest;
 import com.jency.guardian.features.authenticator.dto.response.RecoveryCodesResponse;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,12 +24,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public RegisterResponse register(@RequestBody RegisterRequest request) {
+    public RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 
@@ -42,9 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/login/recovery")
-    public LoginResponse verifyRecoveryCode(
-            @RequestBody VerifyRecoveryCodeRequest request) {
-
+    public LoginResponse verifyRecoveryCode(@RequestBody VerifyRecoveryCodeRequest request) {
         return authService.verifyRecoveryCode(request);
     }
 

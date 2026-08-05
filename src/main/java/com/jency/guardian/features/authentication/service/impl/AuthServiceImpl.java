@@ -1,5 +1,6 @@
 package com.jency.guardian.features.authentication.service.impl;
 
+import com.jency.guardian.common.exception.ApiException;
 import com.jency.guardian.features.authentication.dto.request.LoginOtpVerifyRequest;
 import com.jency.guardian.features.authentication.dto.request.LoginRequest;
 import com.jency.guardian.features.authentication.dto.request.RegisterRequest;
@@ -55,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
     public RegisterResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ApiException("Email already exists");
         }
 
         User user = new User();
@@ -78,13 +79,13 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
 
         if (optionalUser.isEmpty()) {
-            throw new RuntimeException("Invalid email or password");
+            throw new ApiException("Invalid email or password");
         }
 
         User user = optionalUser.get();
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new ApiException("Invalid email or password");
         }
         if (Boolean.TRUE.equals(user.getMfaEnabled())) {
 
@@ -112,17 +113,17 @@ public class AuthServiceImpl implements AuthService {
     public LoginOtpVerifyResponse verifyLoginOtp(LoginOtpVerifyRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found"));
 
         if (!Boolean.TRUE.equals(user.getMfaEnabled())) {
-            throw new RuntimeException("MFA is not enabled for this user.");
+            throw new ApiException("MFA is not enabled for this user.");
         }
 
         AuthenticatorDevice device = deviceRepository
                 .findByUserId(user.getId())
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Authenticator device not found."));
+                .orElseThrow(() -> new ApiException("Authenticator device not found."));
 
         boolean verified = totpService.verify(
                 device.getSecretKey(),
@@ -130,7 +131,7 @@ public class AuthServiceImpl implements AuthService {
         );
 
         if (!verified) {
-            throw new RuntimeException("Invalid OTP.");
+            throw new ApiException("Invalid OTP.");
         }
 
         String token = jwtService.generateToken(user.getEmail());
@@ -153,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApiException("User not found"));
 
         recoveryCodeRepository.deleteByUserId(user.getId());
 

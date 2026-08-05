@@ -44,7 +44,6 @@ public class AuthenticatorController {
     @PostMapping("/disable")
     public ApiResponse disableMfa(
             @RequestBody DisableMfaRequest request) {
-
         return authenticatorService.disableMfa(request);
     }
 }
