@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
         // Remove existing OTP if any
         emailVerificationOtpRepository.deleteByUserId(savedUser.getId());
 
-// Generate 6-digit OTP
+        // Generate 6-digit OTP
         String otp = String.valueOf(
                 (int) ((Math.random() * 900000) + 100000));
 
@@ -388,5 +388,15 @@ public class AuthServiceImpl implements AuthService {
 
         return new ResendEmailOtpResponse(
                 "A new verification OTP has been sent to your email.");
+    }
+
+    @Override
+    public LogoutResponse logout() {
+
+        SecurityContextHolder.clearContext();
+
+        return new LogoutResponse(
+                "Logout successful. Please remove the JWT token from the client."
+        );
     }
 }

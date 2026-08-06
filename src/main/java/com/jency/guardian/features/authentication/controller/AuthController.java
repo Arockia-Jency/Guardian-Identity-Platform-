@@ -71,5 +71,8 @@ public class AuthController {
         return ResponseEntity.ok(authService.resendEmailOtp(request));
     }
 
-
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logout() {
+        return ResponseEntity.ok(authService.logout());
+    }
 }

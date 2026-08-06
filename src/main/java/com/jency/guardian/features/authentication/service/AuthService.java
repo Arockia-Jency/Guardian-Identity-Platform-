@@ -26,4 +26,6 @@ public interface AuthService {
     VerifyEmailOtpResponse verifyEmailOtp(VerifyEmailOtpRequest request);
 
     ResendEmailOtpResponse resendEmailOtp(ResendEmailOtpRequest request);
+
+    LogoutResponse logout();
 }
