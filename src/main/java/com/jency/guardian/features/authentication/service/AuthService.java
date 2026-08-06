@@ -24,4 +24,6 @@ public interface AuthService {
     VerifyResetOtpResponse verifyResetOtp(VerifyResetOtpRequest request);
 
     VerifyEmailOtpResponse verifyEmailOtp(VerifyEmailOtpRequest request);
+
+    ResendEmailOtpResponse resendEmailOtp(ResendEmailOtpRequest request);
 }

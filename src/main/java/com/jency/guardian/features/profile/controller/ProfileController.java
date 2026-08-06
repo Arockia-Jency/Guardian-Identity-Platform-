@@ -9,11 +9,14 @@ import com.jency.guardian.features.profile.dto.response.DeleteAccountResponse;
 import com.jency.guardian.features.profile.dto.response.UpdateProfileResponse;
 import com.jency.guardian.features.profile.dto.response.ProfileResponse;
 import com.jency.guardian.features.profile.service.impl.ProfileService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/profile")
+@SecurityRequirement(name = "Bearer Authentication")
+
 public class ProfileController {
 
     private final ProfileService profileService;

@@ -8,11 +8,14 @@ import com.jency.guardian.features.authenticator.dto.response.DeviceResponse;
 import com.jency.guardian.features.authenticator.dto.response.RegisterAuthenticatorResponse;
 import com.jency.guardian.features.authenticator.dto.response.VerifyOtpResponse;
 import com.jency.guardian.features.authenticator.service.impl.AuthenticatorService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/authenticator")
+@SecurityRequirement(name = "Bearer Authentication")
+
 public class AuthenticatorController {
 
     private final AuthenticatorService authenticatorService;

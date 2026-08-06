@@ -34,6 +34,8 @@ public class SecurityConfig {
                                 "/api/v1/auth/verify-reset-otp",
                                 "/api/v1/auth/reset-password",
                                 "/api/v1/auth/verify-email-otp",
+                                "/api/v1/auth/resend-email-otp",
+
 
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",

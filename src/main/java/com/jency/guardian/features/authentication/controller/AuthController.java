@@ -6,11 +6,15 @@ import com.jency.guardian.features.authentication.dto.response.*;
 import com.jency.guardian.features.authentication.service.AuthService;
 import com.jency.guardian.features.authenticator.dto.request.VerifyRecoveryCodeRequest;
 import com.jency.guardian.features.authenticator.dto.response.RecoveryCodesResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@SecurityRequirement(name = "Bearer Authentication")
+
 public class AuthController {
 
     private final AuthService authService;
@@ -44,14 +48,12 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ForgotPasswordResponse forgotPassword(
-            @RequestBody ForgotPasswordRequest request) {
+    public ForgotPasswordResponse forgotPassword(@RequestBody ForgotPasswordRequest request) {
         return authService.forgotPassword(request);
     }
 
     @PostMapping("/reset-password")
-    public ResetPasswordResponse resetPassword(
-            @RequestBody ResetPasswordRequest request) {
+    public ResetPasswordResponse resetPassword(@RequestBody ResetPasswordRequest request) {
         return authService.resetPassword(request);
     }
 
@@ -61,9 +63,13 @@ public class AuthController {
     }
 
     @PostMapping("/verify-email-otp")
-    public VerifyEmailOtpResponse verifyEmailOtp(
-            @Valid @RequestBody VerifyEmailOtpRequest request) {
+    public VerifyEmailOtpResponse verifyEmailOtp(@Valid @RequestBody VerifyEmailOtpRequest request) {
         return authService.verifyEmailOtp(request);
     }
+    @PostMapping("/resend-email-otp")
+    public ResponseEntity<ResendEmailOtpResponse> resendEmailOtp(@RequestBody ResendEmailOtpRequest request) {
+        return ResponseEntity.ok(authService.resendEmailOtp(request));
+    }
+
 
 }

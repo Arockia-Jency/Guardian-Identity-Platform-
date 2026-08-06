@@ -176,7 +176,6 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-
     @Override
     public RecoveryCodesResponse generateRecoveryCodes() {
 
@@ -213,8 +212,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse verifyRecoveryCode(
-            VerifyRecoveryCodeRequest request) {
+    public LoginResponse verifyRecoveryCode(VerifyRecoveryCodeRequest request) {
 
         RecoveryCode recoveryCode = recoveryCodeRepository
                 .findByCodeAndUsedFalse(request.getCode())
@@ -264,18 +262,17 @@ public class AuthServiceImpl implements AuthService {
 
         passwordResetOtpRepository.save(passwordResetOtp);
 
-        // Temporary (replace with email later)
-        System.out.println("==================================");
-        System.out.println("PASSWORD RESET OTP : " + otp);
-        System.out.println("==================================");
+        passwordResetOtpRepository.save(passwordResetOtp);
+
+       // Send OTP to email
+        emailService.sendOtp(user.getEmail(), otp);
 
         return new ForgotPasswordResponse(
-                "Password reset OTP generated successfully.");
+                "Password reset OTP has been sent to your email.");
     }
 
     @Override
-    public ResetPasswordResponse resetPassword(
-            ResetPasswordRequest request) {
+    public ResetPasswordResponse resetPassword(ResetPasswordRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
@@ -305,8 +302,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public VerifyResetOtpResponse verifyResetOtp(
-            VerifyResetOtpRequest request) {
+    public VerifyResetOtpResponse verifyResetOtp(VerifyResetOtpRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
@@ -333,8 +329,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public VerifyEmailOtpResponse verifyEmailOtp(
-            VerifyEmailOtpRequest request) {
+    public VerifyEmailOtpResponse verifyEmailOtp(VerifyEmailOtpRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
@@ -360,5 +355,38 @@ public class AuthServiceImpl implements AuthService {
         return new VerifyEmailOtpResponse(
                 "Email verified successfully."
         );
+    }
+
+    @Override
+    public ResendEmailOtpResponse resendEmailOtp(ResendEmailOtpRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new ApiException("User not found"));
+
+        if (Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new ApiException("Email is already verified.");
+        }
+
+        String otp = String.valueOf(
+                (int) ((Math.random() * 900000) + 100000));
+
+        EmailVerificationOtp emailOtp =
+                emailVerificationOtpRepository
+                        .findByUserId(user.getId())
+                        .orElse(new EmailVerificationOtp());
+
+        emailOtp.setUser(user);
+        emailOtp.setOtp(otp);
+        emailOtp.setVerified(false);
+        emailOtp.setExpiresAt(
+                LocalDateTime.now().plusMinutes(5));
+
+        emailVerificationOtpRepository.save(emailOtp);
+
+        emailService.sendOtp(user.getEmail(), otp);
+
+        return new ResendEmailOtpResponse(
+                "A new verification OTP has been sent to your email.");
     }
 }
